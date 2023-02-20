@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"time"
@@ -17,7 +18,8 @@ type Postgres struct {
 	connAttempts int
 	connTimeout  time.Duration
 
-	Pool *pgxpool.Pool
+	Pool    *pgxpool.Pool
+	Builder squirrel.StatementBuilderType
 }
 
 func New(url string) (*Postgres, error) {
@@ -25,6 +27,8 @@ func New(url string) (*Postgres, error) {
 		connAttempts: _defaultConnAttempts,
 		connTimeout:  _defaultConnTimeout,
 	}
+
+	pg.Builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
 	config, err := pgxpool.ParseConfig(url)
 	if err != nil {
