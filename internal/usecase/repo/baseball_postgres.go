@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5"
-	"softpro6/internal/entity/sport"
+	"softpro6/internal/usecase"
 	"softpro6/pkg/postgres"
+	"time"
 )
 
 type BaseballRepo struct {
@@ -16,7 +17,7 @@ func NewBaseballRepo(pg *postgres.Postgres) *BaseballRepo {
 	return &BaseballRepo{pg: pg}
 }
 
-func (r BaseballRepo) Store(ctx context.Context, sport sport.Sport) error {
+func (r BaseballRepo) Store(ctx context.Context, sport usecase.Sport) error {
 	tx, err := r.pg.Pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return fmt.Errorf("BaseballRepo - Postgres - Store - r.pg.Pool.BeginTx - unable to start transaction: %v", err)
@@ -56,4 +57,11 @@ func (r BaseballRepo) finishTransaction(ctx context.Context, err error, tx pgx.T
 
 		return nil
 	}
+}
+
+func (r BaseballRepo) GetRecent(ctx context.Context) (usecase.Sport, error) {
+	return nil, nil
+}
+func (r BaseballRepo) IsSynced(ctx context.Context, after time.Time) (bool, error) {
+	return false, nil
 }
