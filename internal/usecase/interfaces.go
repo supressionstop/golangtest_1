@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"softpro6/internal/valueobject"
 	"time"
 )
 
@@ -32,14 +33,14 @@ type StoreSportUseCase interface {
 type (
 	Sport interface {
 		Name() string
-		Rate() float64 // todo rate
+		Rate() valueobject.Rate
 		CreatedAt() time.Time
 	}
 
 	SportRepository interface {
 		GetRecent(ctx context.Context) (Sport, error)
 		IsSynced(ctx context.Context, after time.Time) (bool, error)
-		Store(ctx context.Context, sport Sport) error // todo rate
+		Store(ctx context.Context, sport Sport) error
 	}
 )
 

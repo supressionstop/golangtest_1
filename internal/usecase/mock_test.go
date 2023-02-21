@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 	usecase "softpro6/internal/usecase"
+	valueobject "softpro6/internal/valueobject"
 	time "time"
 
 	gomock "github.com/golang/mock/gomock"
@@ -266,10 +267,10 @@ func (mr *MockSportMockRecorder) Name() *gomock.Call {
 }
 
 // Rate mocks base method.
-func (m *MockSport) Rate() float64 {
+func (m *MockSport) Rate() valueobject.Rate {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Rate")
-	ret0, _ := ret[0].(float64)
+	ret0, _ := ret[0].(valueobject.Rate)
 	return ret0
 }
 

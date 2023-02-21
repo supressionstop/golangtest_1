@@ -1,15 +1,16 @@
 package sport
 
 import (
+	"softpro6/internal/valueobject"
 	"time"
 )
 
 type Baseball struct {
-	rate      float64 // todo
+	rate      valueobject.Rate
 	createdAt time.Time
 }
 
-func NewBaseball(rate float64, createdAt time.Time) *Baseball { // todo rate
+func NewBaseball(rate valueobject.Rate, createdAt time.Time) *Baseball {
 	return &Baseball{
 		rate:      rate,
 		createdAt: createdAt,
@@ -20,7 +21,7 @@ func (s Baseball) Name() string {
 	return "baseball"
 }
 
-func (s Baseball) Rate() float64 { // todo
+func (s Baseball) Rate() valueobject.Rate {
 	return s.rate
 }
 
