@@ -19,12 +19,21 @@ type Logger struct {
 	logger *zap.Logger
 }
 
-func New(level string) *Logger {
+func New(level, appEnvironment string) *Logger {
 	zapLevel, err := zap.ParseAtomicLevel(level)
 	if err != nil {
 		log.Fatalf("invalid log level: %s", err)
 	}
+
 	zapConfig := zap.NewDevelopmentConfig()
+	zapConfig.DisableCaller = true
+	switch appEnvironment {
+	case "prod":
+		zapConfig = zap.NewProductionConfig()
+	default:
+		break
+	}
+
 	zapConfig.Level = zapLevel
 	logger := zap.Must(zapConfig.Build())
 
@@ -44,7 +53,7 @@ func (l *Logger) Warn(message string, args ...interface{}) {
 }
 
 func (l *Logger) Error(message interface{}, args ...interface{}) {
-	l.logger.Warn(l.msg(message), l.anyArgs(args)...)
+	l.logger.Error(l.msg(message), l.anyArgs(args)...)
 }
 
 func (l *Logger) Fatal(message interface{}, args ...interface{}) {
@@ -69,17 +78,23 @@ func (l *Logger) msg(message interface{}) string {
 		return msg
 	case error:
 		return msg.Error()
-	default: // todo fix
-		l.log(fmt.Sprintf("message %v has unknown type %v", message, msg))
+	default:
+		l.Error(fmt.Sprintf("message %v has unknown type %v", message, msg))
 		return ""
 	}
 }
 
-// todo if arg is zap.Field do nothing
-func (l *Logger) anyArgs(args ...interface{}) []zap.Field {
+func (l *Logger) anyArgs(args []interface{}) []zap.Field {
 	fields := make([]zap.Field, 0, len(args))
 	for i, arg := range args {
-		fields = append(fields, zap.Any(strconv.Itoa(i), arg))
+		switch a := arg.(type) {
+		case error:
+			fields = append(fields, zap.Error(a))
+		case zap.Field:
+			fields = append(fields, a)
+		default:
+			fields = append(fields, zap.Any(strconv.Itoa(i), a))
+		}
 	}
 	return fields
 }
