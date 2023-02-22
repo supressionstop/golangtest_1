@@ -38,8 +38,12 @@ func New(url string) (*Postgres, error) {
 	for pg.connAttempts > 0 {
 		pg.Pool, err = pgxpool.NewWithConfig(context.Background(), config)
 		if err == nil {
-			break
+			err = pg.Pool.Ping(context.Background())
+			if err == nil {
+				break
+			}
 		}
+		log.Printf("postgres - New - pgxpool.Ping: %s", err)
 
 		log.Printf("Postgres is trying to connect, attempts left: %d", pg.connAttempts)
 		time.Sleep(pg.connTimeout)
