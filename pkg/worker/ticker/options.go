@@ -9,9 +9,3 @@ func Interval(interval time.Duration) Option {
 		worker.interval = interval
 	}
 }
-
-func Name(name string) Option {
-	return func(worker *Worker) {
-		worker.name = name
-	}
-}

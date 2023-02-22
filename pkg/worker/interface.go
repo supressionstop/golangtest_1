@@ -3,7 +3,8 @@ package worker
 import "context"
 
 type Worker interface {
+	ID() string
 	Start(context.Context)
 	Stop()
-	Restart(context.Context)
+	Notify() <-chan error
 }
