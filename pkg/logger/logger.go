@@ -19,7 +19,7 @@ type Logger struct {
 	logger *zap.Logger
 }
 
-func New(level, appEnvironment string) *Logger {
+func New(level, appEnvironment, appName string) *Logger {
 	zapLevel, err := zap.ParseAtomicLevel(level)
 	if err != nil {
 		log.Fatalf("invalid log level: %s", err)
@@ -36,6 +36,10 @@ func New(level, appEnvironment string) *Logger {
 
 	zapConfig.Level = zapLevel
 	logger := zap.Must(zapConfig.Build())
+
+	if appName != "" {
+		logger = logger.With(zap.String("app", appName))
+	}
 
 	return &Logger{logger: logger}
 }
