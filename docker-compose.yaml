@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+
+  processor:
+    build:
+      dockerfile: docker/processor/Dockerfile
+      context: .
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:12-alpine3.17
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env.local
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./docker/postgres/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
+  kiddy-provider:
+    image: antonboom/lines-provider
+
+volumes:
+  pg-data:

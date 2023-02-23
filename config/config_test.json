@@ -1,0 +1,15 @@
+{
+  "app": {
+    "name": "processor_test",
+    "environment": "test"
+  },
+  "log": {
+    "level": "debug"
+  },
+  "db": {
+    "url": "postgres://kiddy:kiddy_pwd@postgres_test:5432/kiddy_db?&application_name=softpro&sslmode=disable",
+    "migrations_url": "file://migrations"
+  },
+  "workers": [],
+  "providers": {}
+}

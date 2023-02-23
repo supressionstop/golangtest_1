@@ -47,6 +47,8 @@ func Run(cfg *config.Config) {
 	case s := <-interrupt:
 		l.Info("got signal from os", zap.String("signal", s.String()))
 	}
+
+	l.Info("done")
 }
 
 func initProviders(providersCfg map[string]config.Provider) (map[string]usecase.GetLineProvider, error) {

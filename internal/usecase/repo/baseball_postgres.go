@@ -28,14 +28,14 @@ func (r BaseballRepo) Store(ctx context.Context, sport usecase.Sport) error {
 
 	sql, args, err := r.pg.Builder.
 		Insert("baseball").
-		Columns("rate, created_at, provider").
+		Columns("rate", "created_at", "provider").
 		Values(sport.Rate().Value(), sport.CreatedAt(), sport.Rate().Provider()).
 		ToSql()
 	if err != nil {
 		return fmt.Errorf("BaseballRepo - Postgres - Store - r.pg.Builder: %w", err)
 	}
 
-	_, err = r.pg.Pool.Exec(ctx, sql, args)
+	_, err = r.pg.Pool.Exec(ctx, sql, args...)
 	if err != nil {
 		return fmt.Errorf("BaseballRepo - Postgres - Store - r.pg.Pool.Exec: %w", err)
 	}

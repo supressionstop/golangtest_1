@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
+	"strings"
 	"time"
 )
 
@@ -24,7 +26,8 @@ type (
 	}
 
 	DB struct {
-		URL string `mapstructure:"url"`
+		URL           string `mapstructure:"url"`
+		MigrationsUrl string `mapstructure:"migrations_url"`
 	}
 
 	Worker struct {
@@ -39,8 +42,18 @@ type (
 	}
 )
 
-func NewConfig() (*Config, error) {
-	viper.SetConfigName("config")
+func NewConfig(environment string) (*Config, error) {
+	// 1st priority
+	// E.g:
+	// (struct) Config.DB.URL == DB_URL (env)
+	viper.SetEnvKeyReplacer(strings.NewReplacer(`.`, `_`))
+	viper.AutomaticEnv()
+	// 2nd priority
+	if environment == "" {
+		viper.SetConfigName("config")
+	} else {
+		viper.SetConfigName(fmt.Sprintf("config_%s", strings.ToLower(environment)))
+	}
 	viper.SetConfigType("json")
 	viper.AddConfigPath("./config")
 	err := viper.ReadInConfig()
