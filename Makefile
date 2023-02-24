@@ -4,7 +4,7 @@ run:
 
 .PHONY: stop
 stop:
-	docker-compose stop
+	docker-compose stop processor postgres kiddy-provider
 
 .PHONY: test
 test: test-unit test-integration
