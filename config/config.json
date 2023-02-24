@@ -8,7 +8,7 @@
   },
   "db": {
     "url": "postgres://kiddy:kiddy_pwd@postgres:5432/kiddy_db?&application_name=softpro&sslmode=disable",
-    "migrations_url": "file://migrations"
+    "migrations_url": "file:///migrations"
   },
   "workers": [
     {

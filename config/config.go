@@ -3,6 +3,10 @@ package config
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"log"
+	"net/url"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -43,19 +47,23 @@ type (
 )
 
 func NewConfig(environment string) (*Config, error) {
-	// 1st priority
+	// 1st priority - env
 	// E.g:
 	// (struct) Config.DB.URL == DB_URL (env)
 	viper.SetEnvKeyReplacer(strings.NewReplacer(`.`, `_`))
 	viper.AutomaticEnv()
-	// 2nd priority
+	// 2nd priority - json
 	if environment == "" {
 		viper.SetConfigName("config")
 	} else {
 		viper.SetConfigName(fmt.Sprintf("config_%s", strings.ToLower(environment)))
 	}
 	viper.SetConfigType("json")
-	viper.AddConfigPath("./config")
+
+	_, b, _, _ := runtime.Caller(0)
+	configFolderPath := filepath.Dir(b)
+	viper.AddConfigPath(configFolderPath)
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		return nil, err
@@ -67,5 +75,20 @@ func NewConfig(environment string) (*Config, error) {
 		return nil, err
 	}
 
+	appRootPath := filepath.Join(b, "../..")
+	setPathsFromRoot(appRootPath, cfg)
+
 	return cfg, nil
+}
+
+func setPathsFromRoot(projectRoot string, config *Config) {
+	// migrationsUrl
+	mUrl, err := url.Parse(config.DB.MigrationsUrl)
+	if err != nil {
+		log.Fatalf("NewConfig - setPathsFromRoot - MigrationsUrl: %s", err)
+	}
+	newUrl := url.URL{Path: projectRoot}
+	newUrl.Scheme = mUrl.Scheme
+	newUrl = *newUrl.JoinPath(mUrl.Path)
+	config.DB.MigrationsUrl = newUrl.String()
 }
