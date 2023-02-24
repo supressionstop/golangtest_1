@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS baseball;
+DROP TABLE IF EXISTS football;
+DROP TABLE IF EXISTS soccer;
