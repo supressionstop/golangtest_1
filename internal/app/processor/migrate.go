@@ -14,5 +14,5 @@ func init() {
 	if err != nil {
 		log.Panicln("migrate - config.NewConfig: %s", err)
 	}
-	postgres.Migrate(cfg.DB.MigrationsUrl, cfg.DB.URL)
+	postgres.Up(cfg.DB.MigrationsUrl, cfg.DB.URL)
 }
