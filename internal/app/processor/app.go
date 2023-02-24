@@ -24,7 +24,7 @@ func Run(cfg *config.Config) {
 	l := logger.New(cfg.Log.Level, cfg.App.Environment, cfg.App.Name)
 
 	// storage
-	pg, err := postgres.New(cfg.DB.URL)
+	pg, err := postgres.NewWithContext(ctx, cfg.DB.URL)
 	if err != nil {
 		l.Fatal("app - Run - postgres.New", err)
 	}

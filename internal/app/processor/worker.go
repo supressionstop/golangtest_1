@@ -90,5 +90,4 @@ func RunWorker(ctx context.Context, cfg config.Worker, providers map[string]usec
 	w := ticker.New(workerId, uc, ticker.Interval(cfg.PollInterval))
 	w.Start(ctx)
 	return w, nil
-
 }

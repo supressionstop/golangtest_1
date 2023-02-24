@@ -22,7 +22,7 @@ type Postgres struct {
 	Builder squirrel.StatementBuilderType
 }
 
-func New(url string) (*Postgres, error) {
+func NewWithContext(ctx context.Context, url string) (*Postgres, error) {
 	pg := &Postgres{
 		connAttempts: _defaultConnAttempts,
 		connTimeout:  _defaultConnTimeout,
@@ -36,9 +36,9 @@ func New(url string) (*Postgres, error) {
 	}
 
 	for pg.connAttempts > 0 {
-		pg.Pool, err = pgxpool.NewWithConfig(context.Background(), config)
+		pg.Pool, err = pgxpool.NewWithConfig(ctx, config)
 		if err == nil {
-			err = pg.Pool.Ping(context.Background())
+			err = pg.Pool.Ping(ctx)
 			if err == nil {
 				break
 			}
@@ -55,6 +55,10 @@ func New(url string) (*Postgres, error) {
 	}
 
 	return pg, nil
+}
+
+func New(url string) (*Postgres, error) {
+	return NewWithContext(context.Background(), url)
 }
 
 func (p *Postgres) Close() {
