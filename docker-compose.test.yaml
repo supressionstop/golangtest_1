@@ -1,0 +1,43 @@
+version: "3.8"
+
+# Integration testing settings
+services:
+
+  test-processor:
+    build:
+      dockerfile: docker/processor/Dockerfile
+      context: .
+    environment:
+      APP_ENVIRONMENT: test
+    volumes:
+      - .:/app
+    depends_on:
+      - test-postgres
+    restart: unless-stopped
+
+  test-postgres:
+    image: postgres:12-alpine3.17
+    ports:
+      - "5433:5432"
+    env_file:
+      - .env.local
+    volumes:
+      - test-pg-data:/var/lib/postgresql/data
+      - ./docker/postgres/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
+  test-kiddy-provider:
+    image: antonboom/lines-provider
+
+  test-integration:
+    build:
+      context: .
+      dockerfile: docker/processor/Dockerfile.test
+    environment:
+      APP_ENVIRONMENT: test
+    depends_on:
+      - test-processor
+      - test-postgres
+
+volumes:
+  test-pg-data:
