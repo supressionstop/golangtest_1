@@ -2,6 +2,7 @@ package ticker
 
 import (
 	"context"
+	"sync"
 	"time"
 )
 
@@ -12,10 +13,12 @@ const (
 type Worker struct {
 	useCase Executor
 
-	id       string
-	interval time.Duration
-	notify   chan error
-	stop     chan struct{}
+	id                string
+	interval          time.Duration
+	notify            chan error
+	stop              chan struct{}
+	isFirstTimeSynced bool
+	onlyOneSync       sync.Once
 }
 
 type Executor interface {
@@ -57,6 +60,9 @@ func (p *Worker) start(ctx context.Context) {
 			if err != nil {
 				p.notify <- err
 			}
+			p.onlyOneSync.Do(func() {
+				p.isFirstTimeSynced = true
+			})
 		case <-ctx.Done():
 			return
 		case <-p.stop:
@@ -76,4 +82,8 @@ func (p *Worker) Restart(ctx context.Context) {
 
 func (p *Worker) Notify() <-chan error {
 	return p.notify
+}
+
+func (p *Worker) IsSynced() (bool, error) {
+	return p.isFirstTimeSynced, nil
 }

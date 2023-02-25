@@ -6,6 +6,8 @@ services:
     build:
       dockerfile: docker/processor/Dockerfile
       context: .
+    ports:
+      - "8083:80"
     volumes:
       - .:/app
     depends_on:

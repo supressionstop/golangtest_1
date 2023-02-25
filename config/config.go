@@ -13,11 +13,12 @@ import (
 
 type (
 	Config struct {
-		App       `mapstructure:"app"`
-		Log       `mapstructure:"log"`
-		DB        `mapstructure:"db"`
-		Workers   []Worker            `mapstructure:"workers"`
-		Providers map[string]Provider `mapstructure:"providers"`
+		App        `mapstructure:"app"`
+		Log        `mapstructure:"log"`
+		DB         `mapstructure:"db"`
+		Workers    []Worker            `mapstructure:"workers"`
+		Providers  map[string]Provider `mapstructure:"providers"`
+		HttpServer `mapstructure:"http_server"`
 	}
 
 	App struct {
@@ -37,12 +38,16 @@ type (
 	Worker struct {
 		Sport        string        `mapstructure:"sport"`
 		PollInterval time.Duration `mapstructure:"poll_interval"`
-		Provider     string        `mapstructure:"provider"`
+		Provider     string        `mapstructure:"provider" example:"some_provider"`
 	}
 
 	Provider struct {
-		BaseUrl     string        `mapstructure:"base_url"`
-		HttpTimeout time.Duration `mapstructure:"http_timeout"`
+		BaseUrl     string        `mapstructure:"base_url" example:"http://localhost:8080"`
+		HttpTimeout time.Duration `mapstructure:"http_timeout" example:"5s"`
+	}
+
+	HttpServer struct {
+		Address string `mapstructure:"address" example:":80"`
 	}
 )
 

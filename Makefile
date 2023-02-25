@@ -19,6 +19,7 @@ mock: ### update test mock files from interfaces
 bin-deps: ### installs helper binaries
 	GOBIN=$(LOCAL_BIN) go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 	GOBIN=$(LOCAL_BIN) go install github.com/golang/mock/mockgen@latest
+	GOBIN=$(LOCAL_BIN) go install github.com/swaggo/swag/cmd/swag@latest
 
 .PHONY: migrate-create
 migrate-create:  ### create new migration
@@ -32,3 +33,14 @@ test-unit: ### only unit tests
 test-integration: ### up integration env and run tests
 	docker-compose -f docker-compose.test.yaml up -d --build
 	docker-compose -f docker-compose.test.yaml run test-integration
+
+.PHONY: swagger
+swagger: ### update files in api/swagger/
+	swag init -g ./internal/controller/http/v1/router.go -o ./api/swagger
+
+.PHONY: rebuild
+rebuild: ### only unit tests
+	docker-compose stop
+	docker-compose build
+	docker-compose up processor postgres kiddy-provider -d
+

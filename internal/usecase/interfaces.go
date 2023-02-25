@@ -29,12 +29,30 @@ type StoreSportUseCase interface {
 	Execute(ctx context.Context, sport Sport) error
 }
 
+type (
+	IsAppReadyUseCase interface {
+		Execute(ctx context.Context) (Readiness, error)
+	}
+
+	CheckedStorage interface {
+		IsReady() (bool, error)
+	}
+
+	CheckedLine interface {
+		IsSynced() (bool, error)
+	}
+)
+
 // Entities and repos
 type (
 	Sport interface {
 		Name() string
 		Rate() valueobject.Rate
 		CreatedAt() time.Time
+	}
+	Readiness interface {
+		IsReady() bool
+		Reasons() []error
 	}
 
 	SportRepository interface {

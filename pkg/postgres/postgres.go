@@ -66,3 +66,12 @@ func (p *Postgres) Close() {
 		p.Pool.Close()
 	}
 }
+
+func (p *Postgres) IsReady() (bool, error) {
+	err := p.Pool.Ping(context.Background())
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

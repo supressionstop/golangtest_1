@@ -11,5 +11,8 @@
     "migrations_url": "file:///migrations"
   },
   "workers": [],
-  "providers": {}
+  "providers": {},
+  "http_server": {
+    "address": ":80"
+  }
 }

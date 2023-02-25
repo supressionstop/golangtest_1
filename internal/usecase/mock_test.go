@@ -215,6 +215,120 @@ func (mr *MockStoreSportUseCaseMockRecorder) Execute(ctx, sport interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockStoreSportUseCase)(nil).Execute), ctx, sport)
 }
 
+// MockIsAppReadyUseCase is a mock of IsAppReadyUseCase interface.
+type MockIsAppReadyUseCase struct {
+	ctrl     *gomock.Controller
+	recorder *MockIsAppReadyUseCaseMockRecorder
+}
+
+// MockIsAppReadyUseCaseMockRecorder is the mock recorder for MockIsAppReadyUseCase.
+type MockIsAppReadyUseCaseMockRecorder struct {
+	mock *MockIsAppReadyUseCase
+}
+
+// NewMockIsAppReadyUseCase creates a new mock instance.
+func NewMockIsAppReadyUseCase(ctrl *gomock.Controller) *MockIsAppReadyUseCase {
+	mock := &MockIsAppReadyUseCase{ctrl: ctrl}
+	mock.recorder = &MockIsAppReadyUseCaseMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockIsAppReadyUseCase) EXPECT() *MockIsAppReadyUseCaseMockRecorder {
+	return m.recorder
+}
+
+// Execute mocks base method.
+func (m *MockIsAppReadyUseCase) Execute(ctx context.Context) (usecase.Readiness, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Execute", ctx)
+	ret0, _ := ret[0].(usecase.Readiness)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Execute indicates an expected call of Execute.
+func (mr *MockIsAppReadyUseCaseMockRecorder) Execute(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockIsAppReadyUseCase)(nil).Execute), ctx)
+}
+
+// MockCheckedStorage is a mock of CheckedStorage interface.
+type MockCheckedStorage struct {
+	ctrl     *gomock.Controller
+	recorder *MockCheckedStorageMockRecorder
+}
+
+// MockCheckedStorageMockRecorder is the mock recorder for MockCheckedStorage.
+type MockCheckedStorageMockRecorder struct {
+	mock *MockCheckedStorage
+}
+
+// NewMockCheckedStorage creates a new mock instance.
+func NewMockCheckedStorage(ctrl *gomock.Controller) *MockCheckedStorage {
+	mock := &MockCheckedStorage{ctrl: ctrl}
+	mock.recorder = &MockCheckedStorageMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCheckedStorage) EXPECT() *MockCheckedStorageMockRecorder {
+	return m.recorder
+}
+
+// IsReady mocks base method.
+func (m *MockCheckedStorage) IsReady() (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsReady")
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsReady indicates an expected call of IsReady.
+func (mr *MockCheckedStorageMockRecorder) IsReady() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsReady", reflect.TypeOf((*MockCheckedStorage)(nil).IsReady))
+}
+
+// MockCheckedLine is a mock of CheckedLine interface.
+type MockCheckedLine struct {
+	ctrl     *gomock.Controller
+	recorder *MockCheckedLineMockRecorder
+}
+
+// MockCheckedLineMockRecorder is the mock recorder for MockCheckedLine.
+type MockCheckedLineMockRecorder struct {
+	mock *MockCheckedLine
+}
+
+// NewMockCheckedLine creates a new mock instance.
+func NewMockCheckedLine(ctrl *gomock.Controller) *MockCheckedLine {
+	mock := &MockCheckedLine{ctrl: ctrl}
+	mock.recorder = &MockCheckedLineMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCheckedLine) EXPECT() *MockCheckedLineMockRecorder {
+	return m.recorder
+}
+
+// IsSynced mocks base method.
+func (m *MockCheckedLine) IsSynced() (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsSynced")
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsSynced indicates an expected call of IsSynced.
+func (mr *MockCheckedLineMockRecorder) IsSynced() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsSynced", reflect.TypeOf((*MockCheckedLine)(nil).IsSynced))
+}
+
 // MockSport is a mock of Sport interface.
 type MockSport struct {
 	ctrl     *gomock.Controller
@@ -278,6 +392,57 @@ func (m *MockSport) Rate() valueobject.Rate {
 func (mr *MockSportMockRecorder) Rate() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Rate", reflect.TypeOf((*MockSport)(nil).Rate))
+}
+
+// MockReadiness is a mock of Readiness interface.
+type MockReadiness struct {
+	ctrl     *gomock.Controller
+	recorder *MockReadinessMockRecorder
+}
+
+// MockReadinessMockRecorder is the mock recorder for MockReadiness.
+type MockReadinessMockRecorder struct {
+	mock *MockReadiness
+}
+
+// NewMockReadiness creates a new mock instance.
+func NewMockReadiness(ctrl *gomock.Controller) *MockReadiness {
+	mock := &MockReadiness{ctrl: ctrl}
+	mock.recorder = &MockReadinessMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockReadiness) EXPECT() *MockReadinessMockRecorder {
+	return m.recorder
+}
+
+// IsReady mocks base method.
+func (m *MockReadiness) IsReady() bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsReady")
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsReady indicates an expected call of IsReady.
+func (mr *MockReadinessMockRecorder) IsReady() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsReady", reflect.TypeOf((*MockReadiness)(nil).IsReady))
+}
+
+// Reasons mocks base method.
+func (m *MockReadiness) Reasons() []error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Reasons")
+	ret0, _ := ret[0].([]error)
+	return ret0
+}
+
+// Reasons indicates an expected call of Reasons.
+func (mr *MockReadinessMockRecorder) Reasons() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reasons", reflect.TypeOf((*MockReadiness)(nil).Reasons))
 }
 
 // MockSportRepository is a mock of SportRepository interface.

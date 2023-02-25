@@ -74,6 +74,20 @@ func (wp workerPool) watchAndRestart(ctx context.Context) {
 	}()
 }
 
+func (wp workerPool) CheckingAwareLines() ([]usecase.CheckedLine, error) {
+	var result []usecase.CheckedLine
+	for id, w := range wp.workers {
+		switch workerType := w.(type) {
+		case usecase.CheckedLine:
+			result = append(result, workerType)
+			continue
+		default:
+			return nil, fmt.Errorf("workerPool - CheckingAwareLines - not all workers are CheckedLine, bad: ID %s Type %T", id, workerType)
+		}
+	}
+	return result, nil
+}
+
 func RunWorker(ctx context.Context, cfg config.Worker, providers map[string]usecase.GetLineProvider, pg *postgres.Postgres) (worker.Worker, error) {
 	provider, isProviderFound := providers[cfg.Provider]
 	if !isProviderFound {

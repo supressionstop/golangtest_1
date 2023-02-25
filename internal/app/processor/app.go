@@ -3,13 +3,16 @@ package processor
 import (
 	"context"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 	"net/http"
 	"os"
 	"os/signal"
 	"softpro6/config"
+	v1 "softpro6/internal/controller/http/v1"
 	"softpro6/internal/usecase"
 	"softpro6/internal/usecase/repo"
+	"softpro6/pkg/httpsrv"
 	"softpro6/pkg/logger"
 	"softpro6/pkg/postgres"
 	"softpro6/pkg/providers/kiddy"
@@ -41,11 +44,31 @@ func Run(cfg *config.Config) {
 	}
 	wp.watchAndRestart(ctx)
 
+	// http server
+	checkingAwareWorkers, err := wp.CheckingAwareLines()
+	if err != nil {
+		l.Fatal("app - Run - CheckingAwareLines", err)
+	}
+	isAppReady := usecase.NewIsAppReady(pg, checkingAwareWorkers)
+	chiRouter := chi.NewRouter()
+	v1.NewRouter(chiRouter, isAppReady, l)
+	httpServer := httpsrv.NewAndStartOnAddr(chiRouter, cfg.HttpServer.Address)
+	l.Info(fmt.Sprintf("http server started on %s", cfg.HttpServer.Address))
+	l.Info(fmt.Sprintf("swagger available on %s", cfg.HttpServer.Address+"/swagger/"))
+
 	l.Info(fmt.Sprintf("%s started", cfg.App.Name))
 
 	select {
 	case s := <-interrupt:
 		l.Info("got signal from os", zap.String("signal", s.String()))
+	case s := <-httpServer.Notify():
+		l.Error("app - Run - httpServer.Notify", s)
+	}
+
+	// shutdown
+	err = httpServer.Shutdown()
+	if err != nil {
+		l.Error(fmt.Errorf("app - Run - httpServer.Shutdown: %w", err))
 	}
 
 	l.Info("done")

@@ -1,0 +1,36 @@
+basePath: /
+definitions:
+  v1.ErrResponse:
+    properties:
+      error:
+        description: application-level error message, for debugging
+        type: string
+      status:
+        description: user-level status message
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Checking app readiness
+  title: Line Processor
+  version: "1.0"
+paths:
+  /ready:
+    get:
+      consumes:
+      - application/json
+      description: 200 if ready, 500 if not
+      operationId: ready
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.ErrResponse'
+      summary: Check readiness
+      tags:
+      - readiness
+swagger: "2.0"

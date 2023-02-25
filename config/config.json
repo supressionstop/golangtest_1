@@ -27,5 +27,8 @@
       "base_url": "http://kiddy-provider:8000/api",
       "http_timeout": "1s"
     }
+  },
+  "http_server": {
+    "address": ":80"
   }
 }
