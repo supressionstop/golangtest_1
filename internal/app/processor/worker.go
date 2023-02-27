@@ -69,6 +69,8 @@ func (wp workerPool) watchAndRestart(ctx context.Context) {
 				wp.l.Error(fmt.Sprintf("worker error: %s", msg.err), zap.String("worker_id", msg.workerId))
 				wp.workers[msg.workerId].Stop()
 				wp.workers[msg.workerId].Start(ctx)
+			case <-ctx.Done():
+				return
 			}
 		}
 	}()
