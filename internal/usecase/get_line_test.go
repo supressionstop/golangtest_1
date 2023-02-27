@@ -9,13 +9,6 @@ import (
 	"testing"
 )
 
-type test struct {
-	name string
-	mock func()
-	res  interface{}
-	err  error
-}
-
 func makeGetLine(t *testing.T) (usecase.GetLineUseCase, *MockGetLineProvider) {
 	t.Helper()
 
