@@ -113,6 +113,20 @@ func (m *MockLine) EXPECT() *MockLineMockRecorder {
 	return m.recorder
 }
 
+// Provider mocks base method.
+func (m *MockLine) Provider() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Provider")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// Provider indicates an expected call of Provider.
+func (mr *MockLineMockRecorder) Provider() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Provider", reflect.TypeOf((*MockLine)(nil).Provider))
+}
+
 // Rate mocks base method.
 func (m *MockLine) Rate() string {
 	m.ctrl.T.Helper()
@@ -327,6 +341,49 @@ func (m *MockCheckedLine) IsSynced() (bool, error) {
 func (mr *MockCheckedLineMockRecorder) IsSynced() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsSynced", reflect.TypeOf((*MockCheckedLine)(nil).IsSynced))
+}
+
+// MockGetRecentSportsUseCase is a mock of GetRecentSportsUseCase interface.
+type MockGetRecentSportsUseCase struct {
+	ctrl     *gomock.Controller
+	recorder *MockGetRecentSportsUseCaseMockRecorder
+}
+
+// MockGetRecentSportsUseCaseMockRecorder is the mock recorder for MockGetRecentSportsUseCase.
+type MockGetRecentSportsUseCaseMockRecorder struct {
+	mock *MockGetRecentSportsUseCase
+}
+
+// NewMockGetRecentSportsUseCase creates a new mock instance.
+func NewMockGetRecentSportsUseCase(ctrl *gomock.Controller) *MockGetRecentSportsUseCase {
+	mock := &MockGetRecentSportsUseCase{ctrl: ctrl}
+	mock.recorder = &MockGetRecentSportsUseCaseMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockGetRecentSportsUseCase) EXPECT() *MockGetRecentSportsUseCaseMockRecorder {
+	return m.recorder
+}
+
+// Execute mocks base method.
+func (m *MockGetRecentSportsUseCase) Execute(ctx context.Context, sports ...valueobject.Sport) ([]usecase.Sport, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx}
+	for _, a := range sports {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Execute", varargs...)
+	ret0, _ := ret[0].([]usecase.Sport)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Execute indicates an expected call of Execute.
+func (mr *MockGetRecentSportsUseCaseMockRecorder) Execute(ctx interface{}, sports ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx}, sports...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Execute", reflect.TypeOf((*MockGetRecentSportsUseCase)(nil).Execute), varargs...)
 }
 
 // MockSport is a mock of Sport interface.

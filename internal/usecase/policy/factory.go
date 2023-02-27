@@ -11,7 +11,7 @@ import (
 type LineToSport func(line usecase.Line) (usecase.Sport, error)
 
 func (f LineToSport) Export(line usecase.Line) (usecase.Sport, error) {
-	rate, err := valueobject.NewRateFromString(line.Rate(), "generic") // todo provider
+	rate, err := valueobject.NewRateFromString(line.Rate(), line.Provider())
 	if err != nil {
 		return nil, err
 	}

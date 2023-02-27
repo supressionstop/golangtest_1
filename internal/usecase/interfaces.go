@@ -16,6 +16,7 @@ type (
 	}
 
 	Line interface {
+		Provider() string
 		Sport() string
 		Rate() string
 	}
@@ -43,6 +44,26 @@ type (
 	}
 )
 
+type (
+	FirstSyncSubscribeUseCase interface {
+		Execute(ctx context.Context, publishers []FirstSyncPublisher) (FirstSyncSubscription, error)
+	}
+
+	FirstSyncPublisher interface {
+		IAmSynced() <-chan struct{}
+	}
+
+	FirstSyncSubscription interface {
+		IsSynced() <-chan struct{}
+	}
+)
+
+type (
+	GetRecentSportsUseCase interface {
+		Execute(ctx context.Context, sports ...valueobject.Sport) ([]Sport, error)
+	}
+)
+
 // Entities and repos
 type (
 	Sport interface {
@@ -62,7 +83,7 @@ type (
 	}
 )
 
-// Policies -
+// Policies
 
 type (
 	LineToSportPolicy interface {

@@ -8,8 +8,8 @@ import (
 	"softpro6/config"
 	"softpro6/internal/usecase"
 	"softpro6/internal/usecase/policy"
+	"softpro6/internal/valueobject"
 	"softpro6/pkg/logger"
-	"softpro6/pkg/postgres"
 	"softpro6/pkg/worker"
 	"softpro6/pkg/worker/ticker"
 )
@@ -26,7 +26,7 @@ type controlMsg struct {
 	err      error
 }
 
-func newWorkerPool(ctx context.Context, workersConfig []config.Worker, providers map[string]usecase.GetLineProvider, l logger.Interface, pg *postgres.Postgres) (*workerPool, []error) {
+func newWorkerPool(ctx context.Context, workersConfig []config.Worker, providers map[string]usecase.GetLineProvider, l logger.Interface, sportRepos map[valueobject.Sport]usecase.SportRepository) (*workerPool, []error) {
 	wp := &workerPool{
 		l:            l,
 		workers:      make(map[string]worker.Worker, len(workersConfig)),
@@ -35,7 +35,7 @@ func newWorkerPool(ctx context.Context, workersConfig []config.Worker, providers
 
 	var errs []error
 	for _, workerCfg := range workersConfig {
-		w, err := RunWorker(ctx, workerCfg, providers, pg)
+		w, err := RunWorker(ctx, workerCfg, providers, sportRepos)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("app - Run - RunWorker - Sport %s: %w", workerCfg.Sport, err))
 			continue
@@ -88,20 +88,41 @@ func (wp workerPool) CheckingAwareLines() ([]usecase.CheckedLine, error) {
 	return result, nil
 }
 
-func RunWorker(ctx context.Context, cfg config.Worker, providers map[string]usecase.GetLineProvider, pg *postgres.Postgres) (worker.Worker, error) {
+func (wp workerPool) PublishingAwareLines() ([]usecase.FirstSyncPublisher, error) {
+	var result []usecase.FirstSyncPublisher
+	for id, w := range wp.workers {
+		switch workerType := w.(type) {
+		case usecase.FirstSyncPublisher:
+			result = append(result, workerType)
+			continue
+		default:
+			return nil, fmt.Errorf("workerPool - PublishingAwareLines - not all workers are FirstSyncPublisher, bad: ID %s Type %T", id, workerType)
+		}
+	}
+	return result, nil
+}
+
+func RunWorker(ctx context.Context, cfg config.Worker, providers map[string]usecase.GetLineProvider, repoMap map[valueobject.Sport]usecase.SportRepository) (worker.Worker, error) {
+	// UseCase
 	provider, isProviderFound := providers[cfg.Provider]
 	if !isProviderFound {
 		return nil, fmt.Errorf("unknown worker provider: %s", cfg.Provider)
 	}
 	getLine := usecase.NewGetLineUseCase(provider)
-	sportRepo, err := repositoryFactory(pg, cfg.Sport)
-	if err != nil {
-		return nil, fmt.Errorf("iunable to build repo: %w", err)
+
+	// Repository
+	sportRepo, isRepoFound := repoMap[valueobject.NewSport(cfg.Sport)]
+	if !isRepoFound {
+		return nil, fmt.Errorf("repo for sport %s not found", cfg.Sport)
 	}
+
+	// UseCase
 	insertSport := usecase.NewStoreSport(sportRepo)
 	uc := usecase.NewPollProvider(getLine, insertSport, cfg.Sport, new(policy.LineToSport))
+
 	workerId := fmt.Sprintf("%s_%s", cfg.Sport, uuid.New().String())
 	w := ticker.New(workerId, uc, ticker.Interval(cfg.PollInterval))
 	w.Start(ctx)
+
 	return w, nil
 }

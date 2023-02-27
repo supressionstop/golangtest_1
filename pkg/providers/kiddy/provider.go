@@ -11,6 +11,8 @@ import (
 	"softpro6/internal/usecase"
 )
 
+const ID = "kiddy"
+
 type Kiddy struct {
 	httpClient *http.Client
 
@@ -45,12 +47,7 @@ func (p *Kiddy) FetchLine(ctx context.Context, sportName string) (Line, error) {
 	if err != nil {
 		return Line{}, fmt.Errorf("providers - Kiddy - httpClient.Do: %w", err)
 	}
-	defer func(Body io.ReadCloser) {
-		err := Body.Close()
-		if err != nil {
-			panic(err) // todo remove
-		}
-	}(resp.Body)
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return Line{}, fmt.Errorf("providers - Kiddy - resp.StatusCode: %w", err)

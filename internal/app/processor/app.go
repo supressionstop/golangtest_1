@@ -5,13 +5,18 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 	"net/http"
 	"os"
 	"os/signal"
 	"softpro6/config"
-	v1 "softpro6/internal/controller/http/v1"
+	grpcv1 "softpro6/internal/controller/grpc/v1"
+	"softpro6/internal/controller/grpc/v1/pb"
+	httpv1 "softpro6/internal/controller/http/v1"
 	"softpro6/internal/usecase"
 	"softpro6/internal/usecase/repo"
+	"softpro6/internal/valueobject"
+	"softpro6/pkg/grpcsrv"
 	"softpro6/pkg/httpsrv"
 	"softpro6/pkg/logger"
 	"softpro6/pkg/postgres"
@@ -32,13 +37,16 @@ func Run(cfg *config.Config) {
 		l.Fatal("app - Run - postgres.New", err)
 	}
 	defer pg.Close()
+	sportRepoMap := map[valueobject.Sport]usecase.SportRepository{
+		valueobject.Baseball: repo.NewBaseballRepo(pg),
+	}
 
 	// workers
 	providers, err := initProviders(cfg.Providers)
 	if err != nil {
 		l.Fatal("app - Run - initProviders", err)
 	}
-	wp, errs := newWorkerPool(ctx, cfg.Workers, providers, l, pg)
+	wp, errs := newWorkerPool(ctx, cfg.Workers, providers, l, sportRepoMap)
 	if len(errs) != 0 {
 		l.Fatal("app - Run - newWorkerPool", errs)
 	}
@@ -51,10 +59,30 @@ func Run(cfg *config.Config) {
 	}
 	isAppReady := usecase.NewIsAppReady(pg, checkingAwareWorkers)
 	chiRouter := chi.NewRouter()
-	v1.NewRouter(chiRouter, isAppReady, l)
+	httpv1.NewRouter(chiRouter, isAppReady, l)
 	httpServer := httpsrv.NewAndStartOnAddr(chiRouter, cfg.HttpServer.Address)
 	l.Info(fmt.Sprintf("http server started on %s", cfg.HttpServer.Address))
 	l.Info(fmt.Sprintf("swagger available on %s", cfg.HttpServer.Address+"/swagger/"))
+
+	// grpc server
+	publishingAwareWorkers, err := wp.PublishingAwareLines()
+	if err != nil {
+		l.Fatal("app - Run - PublishingAwareLines", err)
+	}
+	firstSyncSubscribe := usecase.NewFirstSyncSubscribe()
+	subscription, err := firstSyncSubscribe.Execute(ctx, publishingAwareWorkers)
+	if err != nil {
+		l.Fatal("app - Run - PublishingAwareLines", err)
+	}
+	getRecentSport := usecase.NewGetRecentSport(sportRepoMap)
+	grpcServer, err := grpcsrv.NewServer(cfg.GrpcServer.Address, l, func(server *grpc.Server) {
+		oursGrpcServer := grpcv1.NewGrpcServer(getRecentSport, l)
+		pb.RegisterProcessorServiceServer(server, oursGrpcServer)
+	})
+	if err != nil {
+		l.Fatal("app - Run - grpcsrv.NewServerAndRun", err)
+	}
+	grpcServer.StartLater(subscription.IsSynced())
 
 	l.Info(fmt.Sprintf("%s started", cfg.App.Name))
 
@@ -63,13 +91,21 @@ func Run(cfg *config.Config) {
 		l.Info("got signal from os", zap.String("signal", s.String()))
 	case s := <-httpServer.Notify():
 		l.Error("app - Run - httpServer.Notify", s)
+	case s := <-grpcServer.Notify():
+		l.Error("app - Run - grpcServer.Notify", s)
 	}
 
 	// shutdown
+	l.Info("http server is shutting")
 	err = httpServer.Shutdown()
 	if err != nil {
 		l.Error(fmt.Errorf("app - Run - httpServer.Shutdown: %w", err))
 	}
+	l.Info("http server has been shut down")
+
+	l.Info("grpc server is shutting")
+	grpcServer.Shutdown()
+	l.Info("grpc server has been shut down")
 
 	l.Info("done")
 }
@@ -92,14 +128,5 @@ func providerFactory(id string, httpClient *http.Client, baseUrl string) (usecas
 		return kiddy.NewKiddy(httpClient, baseUrl)
 	default:
 		return nil, fmt.Errorf("unknown provider: %q", id)
-	}
-}
-
-func repositoryFactory(pg *postgres.Postgres, sport string) (usecase.SportRepository, error) {
-	switch sport {
-	case "baseball":
-		return repo.NewBaseballRepo(pg), nil
-	default:
-		return nil, fmt.Errorf("unknown sport: %q", sport)
 	}
 }

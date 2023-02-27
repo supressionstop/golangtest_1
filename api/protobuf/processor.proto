@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option go_package = "/pb";
+
+package processor;
+
+service ProcessorService {
+  rpc SubscribeOn (stream Subscribe) returns (stream SportsData) {}
+}
+
+message Subscribe{
+  repeated string sports = 1;
+  int32 microseconds = 2;
+}
+
+message SportsData {
+  repeated Result results = 1;
+}
+
+message Result {
+  string sportName = 1;
+  string rate = 2;
+}

@@ -19,6 +19,7 @@ type Worker struct {
 	stop              chan struct{}
 	isFirstTimeSynced bool
 	onlyOneSync       sync.Once
+	firstTimeSync     chan struct{}
 }
 
 type Executor interface {
@@ -29,10 +30,11 @@ func New(id string, useCase Executor, options ...Option) *Worker {
 	w := &Worker{
 		useCase: useCase,
 
-		id:       id,
-		interval: _defaultInterval,
-		notify:   make(chan error, 1),
-		stop:     make(chan struct{}, 1),
+		id:            id,
+		interval:      _defaultInterval,
+		notify:        make(chan error, 1),
+		stop:          make(chan struct{}, 1),
+		firstTimeSync: make(chan struct{}, 1),
 	}
 
 	for _, option := range options {
@@ -62,6 +64,7 @@ func (p *Worker) start(ctx context.Context) {
 			}
 			p.onlyOneSync.Do(func() {
 				p.isFirstTimeSynced = true
+				p.firstTimeSync <- struct{}{}
 			})
 		case <-ctx.Done():
 			return
@@ -86,4 +89,8 @@ func (p *Worker) Notify() <-chan error {
 
 func (p *Worker) IsSynced() (bool, error) {
 	return p.isFirstTimeSynced, nil
+}
+
+func (p *Worker) IAmSynced() <-chan struct{} {
+	return p.firstTimeSync
 }

@@ -44,3 +44,6 @@ rebuild: ### only unit tests
 	docker-compose build
 	docker-compose up processor postgres kiddy-provider -d
 
+.PHONY: proto
+proto:
+	protoc --go_out=internal/controller/grpc/v1 --go-grpc_out=internal/controller/grpc/v1 ./api/protobuf/processor.proto

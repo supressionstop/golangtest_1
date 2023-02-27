@@ -19,6 +19,7 @@ type (
 		Workers    []Worker            `mapstructure:"workers"`
 		Providers  map[string]Provider `mapstructure:"providers"`
 		HttpServer `mapstructure:"http_server"`
+		GrpcServer `mapstructure:"grpc_server"`
 	}
 
 	App struct {
@@ -48,6 +49,10 @@ type (
 
 	HttpServer struct {
 		Address string `mapstructure:"address" example:":80"`
+	}
+
+	GrpcServer struct {
+		Address string `mapstructure:"address" example:":8080"`
 	}
 )
 

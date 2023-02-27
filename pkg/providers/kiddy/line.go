@@ -10,6 +10,10 @@ type Line struct {
 	rate  string
 }
 
+func (l Line) Provider() string {
+	return ID
+}
+
 func (l Line) Sport() string {
 	return l.sport
 }

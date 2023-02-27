@@ -14,5 +14,8 @@
   "providers": {},
   "http_server": {
     "address": ":80"
+  },
+  "grpc_server": {
+    "address": ":8080"
   }
 }

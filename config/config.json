@@ -13,7 +13,7 @@
   "workers": [
     {
       "sport": "baseball",
-      "poll_interval": "5s",
+      "poll_interval": "1s",
       "provider": "kiddy"
     },
     {
@@ -30,5 +30,8 @@
   },
   "http_server": {
     "address": ":80"
+  },
+  "grpc_server": {
+    "address": ":8080"
   }
 }
