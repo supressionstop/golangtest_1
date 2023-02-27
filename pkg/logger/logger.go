@@ -64,18 +64,6 @@ func (l *Logger) Fatal(message interface{}, args ...interface{}) {
 	l.logger.Fatal(l.msg(message), l.anyArgs(args)...)
 }
 
-func (l *Logger) log(message string, args ...interface{}) {
-	if len(args) == 0 {
-		l.logger.Info(message)
-	} else {
-		fields := make([]zap.Field, 0, len(args))
-		for i, arg := range args {
-			fields = append(fields, zap.Any(strconv.Itoa(i), arg))
-		}
-		l.logger.Info(message, fields...)
-	}
-}
-
 func (l *Logger) msg(message interface{}) string {
 	switch msg := message.(type) {
 	case string:
