@@ -9,6 +9,12 @@ stop:
 .PHONY: test
 test: test-unit test-integration
 
+
+.PHONY: lint
+lint:
+	golangci-lint run
+
+
 # Helpers
 
 .PHONY: mock
@@ -20,6 +26,7 @@ bin-deps: ### installs helper binaries
 	GOBIN=$(LOCAL_BIN) go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 	GOBIN=$(LOCAL_BIN) go install github.com/golang/mock/mockgen@latest
 	GOBIN=$(LOCAL_BIN) go install github.com/swaggo/swag/cmd/swag@latest
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.51.1
 
 .PHONY: migrate-create
 migrate-create:  ### create new migration
